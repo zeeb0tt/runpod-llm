@@ -27,7 +27,10 @@ def main():
         "OLLAMA_KEEP_ALIVE": -1,
         "OLLAMA_FLASH_ATTENTION": 1,
         "OLLAMA_SCHED_SPREAD": 1,
-        "RUNPOD_SERVERLESS": 1
+        "RUNPOD_SERVERLESS": 1,
+        "LLM_BACKEND": "ollama",
+        "LLAMA_CPP_THREADS": 8,
+        "LLAMA_CPP_GPU_LAYERS": 0
     }
 
     # Update default config with provided config
@@ -38,8 +41,14 @@ def main():
         os.environ[key] = str(value)
         print(f"Set environment variable {key}={value}")
 
-    print("Running 2_runtime_setup_ollama.sh")
-    subprocess.run(["/bin/sh", "/app/2_runtime_setup_ollama.sh"])
+    backend = os.environ.get("LLM_BACKEND", "ollama").lower()
+    if backend == "llamacpp" or backend == "llama.cpp" or backend == "llama_cpp":
+        script = "/app/2_runtime_setup_llamacpp.sh"
+    else:
+        script = "/app/2_runtime_setup_ollama.sh"
+
+    print(f"Running {script}")
+    subprocess.run(["/bin/sh", script])
 
 if __name__ == "__main__":
     main()

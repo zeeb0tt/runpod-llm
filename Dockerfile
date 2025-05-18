@@ -21,11 +21,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install Python modules
 RUN pip3 install --no-cache-dir \
     runpod \
-    requests
+    requests \
+    llama-cpp-python[server]
 
 # Copy application scripts and configuration
 COPY 1_runtime_entrypoint.py \
      2_runtime_setup_ollama.sh \
+     2_runtime_setup_llamacpp.sh \
      3_runtime_runpod_serverless.py \
      test_input.json \
      /app/
@@ -60,4 +62,4 @@ RUN ollama serve > /app/buildtime_ollama.log 2>&1 & \
 ENTRYPOINT ["/app/1_runtime_entrypoint.py"]
 
 # Define the default command
-CMD ["{\"LLM_MODEL_NAME\":\"hf.co/Qwen/Qwen3-30B-A3B-GGUF:Q8_0\",\"LLM_CONTEXT_LIMIT\":32768,\"OLLAMA_KEEP_ALIVE\":-1,\"OLLAMA_FLASH_ATTENTION\":1,\"OLLAMA_SCHED_SPREAD\":1,\"RUNPOD_SERVERLESS\":1}"]
+CMD ["{\"LLM_MODEL_NAME\":\"hf.co/Qwen/Qwen3-30B-A3B-GGUF:Q8_0\",\"LLM_CONTEXT_LIMIT\":32768,\"OLLAMA_KEEP_ALIVE\":-1,\"OLLAMA_FLASH_ATTENTION\":1,\"OLLAMA_SCHED_SPREAD\":1,\"RUNPOD_SERVERLESS\":1,\"LLM_BACKEND\":\"ollama\",\"LLAMA_CPP_THREADS\":8,\"LLAMA_CPP_GPU_LAYERS\":0}"]
