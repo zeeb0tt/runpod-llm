@@ -1,22 +1,25 @@
 #!/bin/bash
 
-# Start llama.cpp server as a drop-in replacement for Ollama
-
+# Start llama.cpp server
 echo "Starting llama.cpp server..."
+MODEL_PATH="${LLM_MODEL_DIR}/${LLM_MODEL_FILE_NAME}"
+ARGS="--model ${MODEL_PATH} --host 0.0.0.0 --port 11434 --ctx-size ${LLM_MODEL_CONTEXT_LIMIT} --alias ${LLM_MODEL_ALIAS}"
 
-MODEL_PATH="/app/models/${LLM_MODEL_NAME}"
-ARGS="--model ${MODEL_PATH} --host 0.0.0.0 --port 11434 --n_ctx ${LLM_CONTEXT_LIMIT}"
-
-if [ -n "${LLAMA_CPP_THREADS}" ]; then
-    ARGS="$ARGS --n_threads ${LLAMA_CPP_THREADS}"
+# Add arguments if they are set
+if [ -n "${CPU_THREADS}" ]; then
+    ARGS="$ARGS --threads ${CPU_THREADS}"
 fi
 
-if [ -n "${LLAMA_CPP_GPU_LAYERS}" ] && [ "${LLAMA_CPP_GPU_LAYERS}" -gt 0 ]; then
-    ARGS="$ARGS --n_gpu_layers ${LLAMA_CPP_GPU_LAYERS}"
+if [ -n "${GPU_LAYERS}" ]; then
+    ARGS="$ARGS --gpu-layers ${GPU_LAYERS}"
 fi
 
+if [ -n "${FLASH_ATTENTION}" ] && [ "${FLASH_ATTENTION}" = "1" ]; then
+    ARGS="$ARGS --flash-attn"
+fi
+
+# Start the server
 python3 -m llama_cpp.server $ARGS > /app/runtime_llamacpp.log 2>&1 &
-
 sleep 10
 
 if [ "$RUNPOD_SERVERLESS" = "1" ]; then

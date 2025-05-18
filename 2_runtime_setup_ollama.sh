@@ -2,11 +2,12 @@
 
 # Generate the model configuration file for Ollama
 echo "Generating model configuration file..."
+
 # Create a safe filename by replacing special characters
-SAFE_MODEL_NAME=$(echo "$LLM_MODEL_NAME" | tr -c '[:alnum:]._-' '_')
+SAFE_MODEL_NAME=$(echo "$LLM_MODEL_OLLAMA_NAME" | tr -c '[:alnum:]._-' '_')
 MODEL_FILE="/app/ModelFile_$SAFE_MODEL_NAME"
-echo "FROM $LLM_MODEL_NAME" > "$MODEL_FILE"
-echo "PARAMETER num_ctx $LLM_CONTEXT_LIMIT" >> "$MODEL_FILE"
+echo "FROM $LLM_MODEL_OLLAMA_NAME" > "$MODEL_FILE"
+echo "PARAMETER num_ctx $LLM_MODEL_CONTEXT_LIMIT" >> "$MODEL_FILE"
 
 # Start the Ollama server and redirect logs
 echo "Starting the Ollama server..."
@@ -15,7 +16,7 @@ sleep 10  # Wait for the server to start
 
 # Create the model using the model file
 echo "Creating the model from the ModelFile..."
-ollama create llm-model -f "$MODEL_FILE"
+ollama create "$LLM_MODEL_ALIAS" -f "$MODEL_FILE"
 
 if [ "$RUNPOD_SERVERLESS" = "1" ]; then
     echo "Starting the RunPod serverless handler..."
