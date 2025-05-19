@@ -1,15 +1,18 @@
 {
   "input": {
-    "method_name": "generate",
+    "path": "/v1/chat/completions",
     "payload": {
       "model": "llm-model",
-      "prompt": "/think\n\nWhat is the meaning of life?",
-      "options": {
-        "temperature": 0.6,
-        "top_p": 0.95,
-        "presence_penalty": 1.5,
-        "max_tokens": 32768
-      }
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "presence_penalty": 1.5,
+      "max_tokens": 32768,
+      "messages": [
+        {
+          "role": "system",
+          "content": "/think\n\nWhat is the meaning of life?"
+        }
+      ]
     }
   }
 }

@@ -6,9 +6,12 @@ ENV PYTHONUNBUFFERED=1 \
     RUNPOD_SERVERLESS=1 \
     LLM_BACKEND="llama.cpp" \
     LLM_MODEL_DIR=/app/models \
-    LLM_MODEL_OLLAMA_NAME="hf.co/Qwen/Qwen3-30B-A3B-GGUF:Q8_0" \
-    LLM_MODEL_DOWNLOAD_URL="https://huggingface.co/Qwen/Qwen3-30B-A3B-GGUF/resolve/main/Qwen3-30B-A3B-Q8_0.gguf?download=true" \
-    LLM_MODEL_FILE_NAME="Qwen3-30B-A3B-GGUF_Q8_0.gguf" \
+    OLLAMA_MODELS=/app/models \
+    OLLAMA_DIR=/app/ollama \
+    LLM_MODEL_OLLAMA_NAME="hf.co/Qwen/Qwen3-0.6B-GGUF:Q8_0" \
+    LLM_MODEL_DOWNLOAD_URL="https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q8_0.gguf?download=true" \
+    LLM_MODEL_FILE_NAME="Qwen3-0_6B-GGUF-Q8_0.gguf" \
+    LLM_CHAT_FORMAT="qwen" \
     LLM_MODEL_ALIAS="llm-model" \
     LLM_MODEL_CONTEXT_LIMIT=32768 \
     OLLAMA_KEEP_ALIVE=-1 \
@@ -16,7 +19,7 @@ ENV PYTHONUNBUFFERED=1 \
     OLLAMA_SCHED_SPREAD=1 \
     FLASH_ATTENTION=1 \
     CPU_THREADS=-1 \
-    GPU_LAYERS=999999
+    GPU_LAYERS=-1
 
 # Set working directory
 WORKDIR /app
@@ -49,14 +52,18 @@ COPY 1_runtime_entrypoint.py \
 # Convert line endings and make scripts executable
 RUN dos2unix /app/* && chmod +x /app/*.py /app/*.sh
 
-# Install Ollama and download model if LLM_BACKEND is ollama
+# Install Ollama if LLM_BACKEND is ollama
 RUN if [ "$LLM_BACKEND" = "ollama" ]; then \
         curl -fsSL https://ollama.com/install.sh -o /tmp/install.sh && \
-        sed -i 's|red=\$\(.*\)|red=""|' /tmp/install.sh && \
-        sed -i 's|plain=\$\(.*\)|plain=""|' /tmp/install.sh && \
+        sed -i 's|red="$(.*)"|red=""|' /tmp/install.sh && \
+        sed -i 's|plain="$(.*)"|plain=""|' /tmp/install.sh && \
         chmod +x /tmp/install.sh && \
         sh -x /tmp/install.sh && \
-        rm -f /tmp/install.sh && \
+        rm -f /tmp/install.sh; \
+    fi
+
+# Download model if LLM_BACKEND is ollama
+RUN if [ "$LLM_BACKEND" = "ollama" ]; then \
         ollama serve > /app/buildtime_ollama.log 2>&1 & \
         sleep 10 && \
         ollama pull $LLM_MODEL_OLLAMA_NAME && \
@@ -64,9 +71,8 @@ RUN if [ "$LLM_BACKEND" = "ollama" ]; then \
         pkill -f "ollama"; \
     fi
 
-# Install llama.cpp Python binding and download model if LLM_BACKEND is llama.cpp
+# Download model if LLM_BACKEND is llama.cpp
 RUN if [ "$LLM_BACKEND" = "llama.cpp" ]; then \
-        CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python[server] && \
         curl -L $LLM_MODEL_DOWNLOAD_URL -o $LLM_MODEL_DIR/$LLM_MODEL_FILE_NAME; \
     fi
 
