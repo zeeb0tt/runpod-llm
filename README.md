@@ -25,7 +25,7 @@ Refer to the Dockerfile for additional environment variables and their default v
 
 Prebuilt container images for this project are available on Docker Hub: <https://hub.docker.com/r/zeeb0t/runpod-llm>
 
-Build a new image with:
+You can build your own image with:
 
 ```bash
 docker build --tag you/your-repostitory:your-tag --push .
@@ -33,7 +33,7 @@ docker build --tag you/your-repostitory:your-tag --push .
 
 ## Making a Request
 
-Once you have your RunPod instance running, you can make a request to the RunPod run/runsync endpoints with the following JSON payload:
+Once you have your RunPod instance running, you can make a request to the RunPod run/runsync endpoints with the following JSON payload example:
 
 ```json
 {
