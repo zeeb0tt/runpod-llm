@@ -67,7 +67,7 @@ RUN if [ "$LLM_BACKEND" = "ollama" ]; then \
 # Install llama.cpp Python binding and download model if LLM_BACKEND is llama.cpp
 RUN if [ "$LLM_BACKEND" = "llama.cpp" ]; then \
         CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python[server] && \
-        curl -fsSL $LLM_MODEL_DOWNLOAD_URL -o $LLM_MODEL_DIR/$LLM_MODEL_FILE_NAME; \
+        curl -L $LLM_MODEL_DOWNLOAD_URL -o $LLM_MODEL_DIR/$LLM_MODEL_FILE_NAME; \
     fi
 
 # Set the entrypoint script

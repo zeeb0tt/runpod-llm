@@ -3,19 +3,19 @@
 # Start llama.cpp server
 echo "Starting llama.cpp server..."
 MODEL_PATH="${LLM_MODEL_DIR}/${LLM_MODEL_FILE_NAME}"
-ARGS="--model ${MODEL_PATH} --host 0.0.0.0 --port 11434 --ctx-size ${LLM_MODEL_CONTEXT_LIMIT} --alias ${LLM_MODEL_ALIAS}"
+ARGS="--model ${MODEL_PATH} --host 0.0.0.0 --port 11434 --n_ctx ${LLM_MODEL_CONTEXT_LIMIT} --model_alias ${LLM_MODEL_ALIAS}"
 
 # Add arguments if they are set
 if [ -n "${CPU_THREADS}" ]; then
-    ARGS="$ARGS --threads ${CPU_THREADS}"
+    ARGS="$ARGS --n_threads ${CPU_THREADS}"
 fi
 
 if [ -n "${GPU_LAYERS}" ]; then
-    ARGS="$ARGS --gpu-layers ${GPU_LAYERS}"
+    ARGS="$ARGS --n_gpu_layers ${GPU_LAYERS}"
 fi
 
 if [ -n "${FLASH_ATTENTION}" ] && [ "${FLASH_ATTENTION}" = "1" ]; then
-    ARGS="$ARGS --flash-attn"
+    ARGS="$ARGS --flash_attn"
 fi
 
 # Start the server
