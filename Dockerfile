@@ -8,9 +8,9 @@ ENV PYTHONUNBUFFERED=1 \
     LLM_MODEL_DIR=/app/models \
     OLLAMA_MODELS=/app/models \
     OLLAMA_DIR=/app/ollama \
-    LLM_MODEL_OLLAMA_NAME="qwen3:30b-a3b-q4_K_M" \
-    LLM_MODEL_DOWNLOAD_URL="https://huggingface.co/Qwen/Qwen3-30B-A3B-GGUF/resolve/main/Qwen3-30B-A3B-Q4_K_M.gguf?download=true" \
-    LLM_MODEL_FILE_NAME="Qwen3-30B-A3B-Q4_K_M.gguf" \
+    LLM_MODEL_OLLAMA_NAME="qwen3:14b-q4_K_M" \
+    LLM_MODEL_DOWNLOAD_URL="https://huggingface.co/Qwen/Qwen3-14B-GGUF/resolve/main/Qwen3-14B-Q4_K_M.gguf?download=true" \
+    LLM_MODEL_FILE_NAME="Qwen3-14B-Q4_K_M.gguf" \
     LLM_CHAT_FORMAT="qwen" \
     LLM_MODEL_ALIAS="llm-model" \
     LLM_MODEL_CONTEXT_LIMIT=32768 \
