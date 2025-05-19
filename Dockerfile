@@ -4,19 +4,20 @@ FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     RUNPOD_SERVERLESS=1 \
-    LLM_BACKEND="llama.cpp" \
+    LLM_BACKEND="ollama" \
     LLM_MODEL_DIR=/app/models \
     OLLAMA_MODELS=/app/models \
     OLLAMA_DIR=/app/ollama \
-    LLM_MODEL_OLLAMA_NAME="hf.co/Qwen/Qwen3-30B-A3B-GGUF:Q8_0" \
-    LLM_MODEL_DOWNLOAD_URL="https://huggingface.co/Qwen/Qwen3-30B-A3B-GGUF/resolve/main/Qwen3-30B-A3B-Q8_0.gguf?download=true" \
-    LLM_MODEL_FILE_NAME="Qwen3-30B-A3B-Q8_0.gguf" \
+    LLM_MODEL_OLLAMA_NAME="qwen3:30b-a3b-q4_K_M" \
+    LLM_MODEL_DOWNLOAD_URL="https://huggingface.co/Qwen/Qwen3-30B-A3B-GGUF/resolve/main/Qwen3-30B-A3B-Q4_K_M.gguf?download=true" \
+    LLM_MODEL_FILE_NAME="Qwen3-30B-A3B-Q4_K_M.gguf" \
     LLM_CHAT_FORMAT="qwen" \
     LLM_MODEL_ALIAS="llm-model" \
     LLM_MODEL_CONTEXT_LIMIT=32768 \
     OLLAMA_KEEP_ALIVE=-1 \
     OLLAMA_FLASH_ATTENTION=1 \
     OLLAMA_SCHED_SPREAD=1 \
+    OLLAMA_KV_CACHE_TYPE=q8_0 \
     FLASH_ATTENTION=1 \
     CPU_THREADS=-1 \
     GPU_LAYERS=-1
