@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 
-import os
 import runpod
 import requests
 
 def handler(job):
-    base_url = "http://localhost:11434"
-    payload = job["input"]["payload"]
-    method_name = job["input"]["method_name"]
-    payload["stream"] = False  # Disable streaming as required
-    resp = requests.post(
-        url=f"{base_url}/api/{method_name}/",
-        headers={"Content-Type": "application/json"},
-        json=payload,
-    )
-    resp.encoding = "utf-8"
-    return resp.json()
+    try:
+        resp = requests.post(
+            url=f"http://localhost:11434{job['input']['path']}",
+            headers={"Authorization":"Bearer not-used-but-required","Content-Type":"application/json"},
+            json=job["input"]["payload"],
+        )
+        resp.raise_for_status()
+        resp.encoding = "utf-8"
+        return resp.json()
+    except requests.exceptions.RequestException as e:
+        return {"error": str(e), "status_code": getattr(e.response, 'status_code', 500)}
 
 if __name__ == "__main__":
     # Start the RunPod serverless function
