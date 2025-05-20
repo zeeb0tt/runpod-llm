@@ -4,8 +4,8 @@ import os
 import subprocess
 
 def main():
-    # Run the appropriate setup script based on the LLM_BACKEND environment variable
-    backend = os.environ.get("LLM_BACKEND", "ollama").lower()
+    # Run the appropriate setup script based on the RUNPOD_LLM_BACKEND environment variable
+    backend = os.environ.get("RUNPOD_LLM_BACKEND", "ollama").lower()
     if backend == "llama.cpp":
         script = "/app/2_runtime_setup_llamacpp.sh"
     else:

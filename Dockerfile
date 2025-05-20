@@ -2,31 +2,32 @@
 FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
 
 # Set environment variables
-ENV PYTHONUNBUFFERED=1 \
-    RUNPOD_SERVERLESS=1 \
-    LLM_BACKEND="ollama" \
-    LLM_MODEL_DIR=/app/models \
-    OLLAMA_MODELS=/app/models \
-    OLLAMA_DIR=/app/ollama \
-    LLM_MODEL_OLLAMA_NAME="qwen3:4b-q4_K_M" \
-    LLM_MODEL_DOWNLOAD_URL="https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q4_K_M.gguf?download=true" \
-    LLM_MODEL_FILE_NAME="Qwen3-4B-Q4_K_M.gguf" \
-    LLM_CHAT_FORMAT="qwen" \
-    LLM_MODEL_ALIAS="llm-model" \
-    LLM_MODEL_CONTEXT_LIMIT=32768 \
-    OLLAMA_KEEP_ALIVE=-1 \
-    OLLAMA_FLASH_ATTENTION=1 \
-    OLLAMA_SCHED_SPREAD=1 \
-    OLLAMA_KV_CACHE_TYPE=q8_0 \
-    FLASH_ATTENTION=1 \
-    CPU_THREADS=-1 \
-    GPU_LAYERS=-1
+ENV PYTHONUNBUFFERED="1" \
+    RUNPOD_LLM_SERVERLESS="1" \
+    RUNPOD_LLM_BACKEND="ollama" \
+    RUNPOD_LLM_MODEL_DIR="/app/models" \
+    RUNPOD_LLM_OLLAMA_MODEL_NAME="qwen3:4b-q4_K_M" \
+    RUNPOD_LLM_MODEL_DOWNLOAD_URL="https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q4_K_M.gguf?download=true" \
+    RUNPOD_LLM_MODEL_FILE_NAME="Qwen3-4B-Q4_K_M.gguf" \
+    RUNPOD_LLM_MODEL_ALIAS="llm-model" \
+    \
+    OLLAMA_KEEP_ALIVE="-1" \
+    OLLAMA_SCHED_SPREAD="1" \
+    \
+    RUNPOD_LLM_FLASH_ATTENTION="1" \
+    RUNPOD_LLM_CONTEXT_LIMIT="40960" \
+    RUNPOD_LLM_CACHE_QUANTIZATION="q8_0"
+
+# Set Ollama-specific environment variables
+ENV OLLAMA_MODELS="${RUNPOD_LLM_MODEL_DIR}" \
+    OLLAMA_FLASH_ATTENTION="${RUNPOD_LLM_FLASH_ATTENTION}" \
+    OLLAMA_KV_CACHE_TYPE="${RUNPOD_LLM_CACHE_QUANTIZATION}"
 
 # Set working directory
 WORKDIR /app
 
 # Create models directory
-RUN mkdir -p "$LLM_MODEL_DIR"
+RUN mkdir -p "$RUNPOD_LLM_MODEL_DIR"
 
 # Install required packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -38,7 +39,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python modules
-RUN pip3 install --no-cache-dir \
+RUN pip3 install --root-user-action=ignore --no-cache-dir \
     runpod \
     requests
 
@@ -53,8 +54,8 @@ COPY 1_runtime_entrypoint.py \
 # Convert line endings and make scripts executable
 RUN dos2unix /app/* && chmod +x /app/*.py /app/*.sh
 
-# Install Ollama if LLM_BACKEND is ollama
-RUN if [ "$LLM_BACKEND" = "ollama" ]; then \
+# Install Ollama if RUNPOD_LLM_BACKEND is ollama
+RUN if [ "$RUNPOD_LLM_BACKEND" = "ollama" ]; then \
         curl -fsSL https://ollama.com/install.sh -o /tmp/install.sh && \
         sed -i 's|red="$(.*)"|red=""|' /tmp/install.sh && \
         sed -i 's|plain="$(.*)"|plain=""|' /tmp/install.sh && \
@@ -63,18 +64,18 @@ RUN if [ "$LLM_BACKEND" = "ollama" ]; then \
         rm -f /tmp/install.sh; \
     fi
 
-# Download model if LLM_BACKEND is ollama
-RUN if [ "$LLM_BACKEND" = "ollama" ]; then \
+# Download model if RUNPOD_LLM_BACKEND is ollama
+RUN if [ "$RUNPOD_LLM_BACKEND" = "ollama" ]; then \
         ollama serve > /app/buildtime_ollama.log 2>&1 & \
         sleep 10 && \
-        ollama pull $LLM_MODEL_OLLAMA_NAME && \
+        ollama pull $RUNPOD_LLM_OLLAMA_MODEL_NAME && \
         sleep 10 && \
         pkill -f "ollama"; \
     fi
 
-# Download model if LLM_BACKEND is llama.cpp
-RUN if [ "$LLM_BACKEND" = "llama.cpp" ]; then \
-        curl -L $LLM_MODEL_DOWNLOAD_URL -o $LLM_MODEL_DIR/$LLM_MODEL_FILE_NAME; \
+# Download model if RUNPOD_LLM_BACKEND is llama.cpp
+RUN if [ "$RUNPOD_LLM_BACKEND" = "llama.cpp" ]; then \
+        curl -L $RUNPOD_LLM_MODEL_DOWNLOAD_URL -o $RUNPOD_LLM_MODEL_DIR/$RUNPOD_LLM_MODEL_FILE_NAME; \
     fi
 
 # Set the entrypoint script
