@@ -6,17 +6,17 @@ ENV PYTHONUNBUFFERED="1" \
     RUNPOD_LLM_SERVERLESS="1" \
     RUNPOD_LLM_BACKEND="ollama" \
     RUNPOD_LLM_MODEL_DIR="/app/models" \
-    RUNPOD_LLM_OLLAMA_MODEL_NAME="qwen3:4b-q4_K_M" \
-    RUNPOD_LLM_MODEL_DOWNLOAD_URL="https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q4_K_M.gguf?download=true" \
-    RUNPOD_LLM_MODEL_FILE_NAME="Qwen3-4B-Q4_K_M.gguf" \
+    RUNPOD_LLM_OLLAMA_MODEL_NAME="gemma3:12b-it-qat" \
+    RUNPOD_LLM_MODEL_DOWNLOAD_URL="https://huggingface.co/google/gemma-3-12b-it-qat-q4_0-gguf/resolve/main/gemma-3-12b-it-q4_0.gguf?download=true" \
+    RUNPOD_LLM_MODEL_FILE_NAME="gemma-3-12b-it-q4_0.gguf" \
     RUNPOD_LLM_MODEL_ALIAS="llm-model" \
     \
     OLLAMA_KEEP_ALIVE="-1" \
     OLLAMA_SCHED_SPREAD="1" \
     \
-    RUNPOD_LLM_FLASH_ATTENTION="1" \
-    RUNPOD_LLM_CONTEXT_LIMIT="40960" \
-    RUNPOD_LLM_CACHE_QUANTIZATION="q8_0"
+    RUNPOD_LLM_FLASH_ATTENTION="-1" \
+    RUNPOD_LLM_CONTEXT_LIMIT="128000" \
+    RUNPOD_LLM_CACHE_QUANTIZATION=""
 
 # Set Ollama-specific environment variables
 ENV OLLAMA_MODELS="${RUNPOD_LLM_MODEL_DIR}" \
